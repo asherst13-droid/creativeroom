@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artist — Track</title>
+<style>
+  :root {
+    --magenta: #ff00ff;
+    --magenta-glow: rgba(255, 0, 255, 0.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: #000;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .player {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .cover {
+    width: 260px;
+    height: 260px;
+    border-radius: 12px;
+    object-fit: cover;
+    margin-bottom: 32px;
+    box-shadow: 0 0 40px var(--magenta-glow);
+    background: #111;
+  }
+
+  .artist {
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--magenta);
+    opacity: 0.85;
+    margin-bottom: 8px;
+  }
+
+  .title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--magenta);
+    margin-bottom: 32px;
+    line-height: 1.2;
+    text-shadow: 0 0 20px var(--magenta-glow);
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--magenta);
+    transition: transform 0.15s ease, filter 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  button:hover { filter: drop-shadow(0 0 12px var(--magenta)); }
+  button:active { transform: scale(0.92); }
+
+  .play-btn {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 2px solid var(--magenta);
+    box-shadow: 0 0 24px var(--magenta-glow), inset 0 0 12px var(--magenta-glow);
+  }
+
+  .skip-btn {
+    width: 44px;
+    height: 44px;
+    opacity: 0.8;
+  }
+
+  .progress-wrap {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .progress {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 0, 255, 0.2);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--magenta);
+    box-shadow: 0 0 8px var(--magenta);
+    transition: width 0.1s linear;
+  }
+
+  .time {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 12px;
+    color: var(--magenta);
+    opacity: 0.7;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 480px) {
+    .cover { width: 200px; height: 200px; }
+    .title { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="player">
+  <!-- Замени cover.jpg на свою обложку или убери строку -->
+  <img class="cover" src="cover.jpg" alt="" onerror="this.style.display='none'">
+
+  <div class="artist">Artist Name</div>
+  <div class="title">Track Title</div>
+
+  <div class="controls">
+    <button class="skip-btn" id="back" aria-label="Назад 10 секунд">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/>
+      </svg>
+    </button>
+    <button class="play-btn" id="play" aria-label="Играть">
+      <svg id="play-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+    </button>
+    <button class="skip-btn" id="forward" aria-label="Вперёд 10 секунд">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M13 6v12l8.5-6L13 6zM4 18l8.5-6L4 6v12z"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress" id="progress">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <div class="time">
+    <span id="current">0:00</span>
+    <span id="duration">0:00</span>
+  </div>
+</div>
+
+<!-- Замени track.mp3 на свой файл -->
+<audio id="audio" src="track.mp3" preload="metadata"></audio>
+
+<script>
+  const audio = document.getElementById('audio');
+  const playBtn = document.getElementById('play');
+  const playIcon = document.getElementById('play-icon');
+  const progress = document.getElementById('progress');
+  const progressFill = document.getElementById('progress-fill');
+  const current = document.getElementById('current');
+  const duration = document.getElementById('duration');
+  const back = document.getElementById('back');
+  const forward = document.getElementById('forward');
+
+  const PLAY = '<path d="M8 5v14l11-7z"/>';
+  const PAUSE = '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';
+
+  function fmt(sec) {
+    if (!isFinite(sec)) return '0:00';
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  playBtn.addEventListener('click', () => {
+    if (audio.paused) audio.play();
+    else audio.pause();
+  });
+
+  audio.addEventListener('play', () => playIcon.innerHTML = PAUSE);
+  audio.addEventListener('pause', () => playIcon.innerHTML = PLAY);
+
+  audio.addEventListener('loadedmetadata', () => {
+    duration.textContent = fmt(audio.duration);
+  });
+
+  audio.addEventListener('timeupdate', () => {
+    const pct = (audio.currentTime / audio.duration) * 100 || 0;
+    progressFill.style.width = pct + '%';
+    current.textContent = fmt(audio.currentTime);
+  });
+
+  audio.addEventListener('ended', () => {
+    playIcon.innerHTML = PLAY;
+    progressFill.style.width = '0%';
+    audio.currentTime = 0;
+  });
+
+  progress.addEventListener('click', (e) => {
+    const rect = progress.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    audio.currentTime = pct * audio.duration;
+  });
+
+  back.addEventListener('click', () => {
+    audio.currentTime = Math.max(0, audio.currentTime - 10);
+  });
+
+  forward.addEventListener('click', () => {
+    audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+  });
+</script>
+
+</body>
+</html>
