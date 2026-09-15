@@ -24,6 +24,7 @@
     align-items: center;
     justify-content: center;
     padding: 24px;
+    perspective: 1200px; /* глубина 3D для всего тела */
   }
 
   .player {
@@ -35,16 +36,58 @@
     text-align: center;
   }
 
-  .cover {
+  /* ===== 3D-обложка ===== */
+  .cover-3d {
     width: 260px;
     height: 260px;
-    border-radius: 12px;
-    object-fit: cover;
     margin-bottom: 32px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+    cursor: pointer;
+  }
+
+  .cover-3d:hover,
+  .cover-3d.flipped {
+    transform: rotateY(180deg);
+  }
+
+  .cover-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     box-shadow: 0 0 40px var(--magenta-glow);
     background: #111;
   }
 
+  .cover-face img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* Лицевая — верх фото (лицо) */
+  .cover-front img {
+    object-position: center top;
+transform: scale(1.1);
+  }
+
+  /* Обратная — низ фото */
+  .cover-back {
+    transform: rotateY(180deg);
+  }
+  .cover-back img {
+    object-position: center bottom;
+transform: scale(1.7);
+  }
+
+  /* ===== Текст ===== */
   .artist {
     font-size: 14px;
     letter-spacing: 0.2em;
@@ -63,6 +106,7 @@
     text-shadow: 0 0 20px var(--magenta-glow);
   }
 
+  /* ===== Контролы ===== */
   .controls {
     display: flex;
     align-items: center;
@@ -92,16 +136,9 @@
     box-shadow: 0 0 24px var(--magenta-glow), inset 0 0 12px var(--magenta-glow);
   }
 
-  .skip-btn {
-    width: 44px;
-    height: 44px;
-    opacity: 0.8;
-  }
+  .skip-btn { width: 44px; height: 44px; opacity: 0.8; }
 
-  .progress-wrap {
-    width: 100%;
-    margin-bottom: 12px;
-  }
+  .progress-wrap { width: 100%; margin-bottom: 12px; }
 
   .progress {
     width: 100%;
@@ -109,7 +146,6 @@
     background: rgba(255, 0, 255, 0.2);
     border-radius: 2px;
     cursor: pointer;
-    position: relative;
     overflow: hidden;
   }
 
@@ -132,8 +168,13 @@
   }
 
   @media (max-width: 480px) {
-    .cover { width: 200px; height: 200px; }
+    .cover-3d { width: 200px; height: 200px; }
     .title { font-size: 22px; }
+  }
+
+
+  @media (hover: none) {
+    .cover-3d:hover { transform: none; }
   }
 </style>
 </head>
@@ -141,23 +182,33 @@
 
 <div class="player">
 
-  <img class="cover" src="https://vk.ru/photo106708534_457251017" alt="" onerror="this.style.display='none'">
+
+  <div class="cover-3d" id="cover" title="">
+    <div class="cover-face cover-front">
+      <!-- ВЕРХ фото (лицо) -->
+      <img src="cover.png" alt="">
+    </div>
+    <div class="cover-face cover-back">
+
+      <img src="cover.png" alt="">
+    </div>
+  </div>
 
   <div class="artist">Nasty Dolls</div>
   <div class="title">Track 1 Main Riff</div>
 
   <div class="controls">
-    <button class="skip-btn" id="back" aria-label="Íàçàä 10 ñåêóíä">
+    <button class="skip-btn" id="back" aria-label="Назад 10 секунд">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
         <path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/>
       </svg>
     </button>
-    <button class="play-btn" id="play" aria-label="Èãðàòü">
+    <button class="play-btn" id="play" aria-label="Играть">
       <svg id="play-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
         <path d="M8 5v14l11-7z"/>
       </svg>
     </button>
-    <button class="skip-btn" id="forward" aria-label="Âïåð¸ä 10 ñåêóíä">
+    <button class="skip-btn" id="forward" aria-label="Вперёд 10 секунд">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
         <path d="M13 6v12l8.5-6L13 6zM4 18l8.5-6L4 6v12z"/>
       </svg>
@@ -176,7 +227,6 @@
   </div>
 </div>
 
-<!-- Çàìåíè track.mp3 íà ñâîé ôàéë -->
 <audio id="audio" src="track.mp3" preload="metadata"></audio>
 
 <script>
@@ -189,23 +239,23 @@
   const duration = document.getElementById('duration');
   const back = document.getElementById('back');
   const forward = document.getElementById('forward');
+  const cover = document.getElementById('cover');
 
   const PLAY = '<path d="M8 5v14l11-7z"/>';
   const PAUSE = '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';
 
-  function fmt(sec) {
+  const fmt = (sec) => {
     if (!isFinite(sec)) return '0:00';
     const m = Math.floor(sec / 60);
     const s = Math.floor(sec % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
-  }
+  };
 
   playBtn.addEventListener('click', () => {
-    if (audio.paused) audio.play();
-    else audio.pause();
+    audio.paused ? audio.play() : audio.pause();
   });
 
-  audio.addEventListener('play', () => playIcon.innerHTML = PAUSE);
+  audio.addEventListener('play',  () => playIcon.innerHTML = PAUSE);
   audio.addEventListener('pause', () => playIcon.innerHTML = PLAY);
 
   audio.addEventListener('loadedmetadata', () => {
@@ -230,13 +280,11 @@
     audio.currentTime = pct * audio.duration;
   });
 
-  back.addEventListener('click', () => {
-    audio.currentTime = Math.max(0, audio.currentTime - 10);
-  });
+  back.addEventListener('click',    () => audio.currentTime = Math.max(0, audio.currentTime - 10));
+  forward.addEventListener('click', () => audio.currentTime = Math.min(audio.duration, audio.currentTime + 10));
 
-  forward.addEventListener('click', () => {
-    audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
-  });
+  // Тап на мобиле — переключаем класс flipped
+  cover.addEventListener('click', () => cover.classList.toggle('flipped'));
 </script>
 
 </body>
