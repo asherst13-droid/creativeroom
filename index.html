@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Artist — Track</title>
+<title>Nasty Dolls — Track 1 Main Riff</title>
 <style>
   :root {
     --magenta: #ff00ff;
@@ -24,7 +24,7 @@
     align-items: center;
     justify-content: center;
     padding: 24px;
-    perspective: 1200px; /* глубина 3D для всего тела */
+    perspective: 1200px;
   }
 
   .player {
@@ -44,10 +44,8 @@
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
-    cursor: pointer;
   }
 
-  .cover-3d:hover,
   .cover-3d.flipped {
     transform: rotateY(180deg);
   }
@@ -75,7 +73,7 @@
   /* Лицевая — верх фото (лицо) */
   .cover-front img {
     object-position: center top;
-transform: scale(1.1);
+    transform: scale(1.1);
   }
 
   /* Обратная — низ фото */
@@ -84,7 +82,7 @@ transform: scale(1.1);
   }
   .cover-back img {
     object-position: center bottom;
-transform: scale(1.7);
+    transform: scale(1.7);
   }
 
   /* ===== Текст ===== */
@@ -171,25 +169,17 @@ transform: scale(1.7);
     .cover-3d { width: 200px; height: 200px; }
     .title { font-size: 22px; }
   }
-
-
-  @media (hover: none) {
-    .cover-3d:hover { transform: none; }
-  }
 </style>
 </head>
 <body>
 
 <div class="player">
 
-
-  <div class="cover-3d" id="cover" title="">
+  <div class="cover-3d" id="cover">
     <div class="cover-face cover-front">
-      <!-- ВЕРХ фото (лицо) -->
       <img src="cover.png" alt="">
     </div>
     <div class="cover-face cover-back">
-
       <img src="cover.png" alt="">
     </div>
   </div>
@@ -252,7 +242,13 @@ transform: scale(1.7);
   };
 
   playBtn.addEventListener('click', () => {
-    audio.paused ? audio.play() : audio.pause();
+    if (audio.paused) {
+      audio.play();
+      cover.classList.add('flipped');
+    } else {
+      audio.pause();
+      cover.classList.remove('flipped');
+    }
   });
 
   audio.addEventListener('play',  () => playIcon.innerHTML = PAUSE);
@@ -272,6 +268,7 @@ transform: scale(1.7);
     playIcon.innerHTML = PLAY;
     progressFill.style.width = '0%';
     audio.currentTime = 0;
+    cover.classList.remove('flipped');
   });
 
   progress.addEventListener('click', (e) => {
@@ -282,9 +279,6 @@ transform: scale(1.7);
 
   back.addEventListener('click',    () => audio.currentTime = Math.max(0, audio.currentTime - 10));
   forward.addEventListener('click', () => audio.currentTime = Math.min(audio.duration, audio.currentTime + 10));
-
-  // Тап на мобиле — переключаем класс flipped
-  cover.addEventListener('click', () => cover.classList.toggle('flipped'));
 </script>
 
 </body>
