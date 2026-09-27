@@ -44,18 +44,12 @@
     text-align: center;
   }
 
-  /* ===== 3D-обложка ===== */
+  /* ===== 3D-обложка (статичная) ===== */
   .cover-3d {
     width: 260px;
     height: 260px;
     margin-bottom: 32px;
     position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
-  }
-
-  .cover-3d.flipped {
-    transform: rotateY(180deg);
   }
 
   .cover-face {
@@ -63,8 +57,6 @@
     inset: 0;
     border-radius: 12px;
     overflow: hidden;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
     box-shadow: 0 0 40px var(--magenta-glow);
     background: #111;
   }
@@ -82,15 +74,6 @@
   .cover-front img {
     object-position: center top;
     transform: scale(1.1);
-  }
-
-  /* Обратная — низ фото */
-  .cover-back {
-    transform: rotateY(180deg);
-  }
-  .cover-back img {
-    object-position: center bottom;
-    transform: scale(1.7);
   }
 
   /* ===== Текст ===== */
@@ -185,11 +168,8 @@
 
   <!-- Карточка 1: Nasty Dollz -->
   <div class="player" data-audio="audio1">
-    <div class="cover-3d" id="cover1">
+    <div class="cover-3d">
       <div class="cover-face cover-front">
-        <img src="cover.png" alt="">
-      </div>
-      <div class="cover-face cover-back">
         <img src="cover.png" alt="">
       </div>
     </div>
@@ -229,12 +209,9 @@
 
   <!-- Карточка 2: Sashk Only — last song -->
   <div class="player" data-audio="audio2">
-    <div class="cover-3d" id="cover2">
+    <div class="cover-3d">
       <div class="cover-face cover-front">
-        <img src="cover.png" alt="">
-      </div>
-      <div class="cover-face cover-back">
-        <img src="cover.png" alt="">
+        <img src="cover2.png" alt="">
       </div>
     </div>
 
@@ -288,11 +265,9 @@
     return `${m}:${s}`;
   };
 
-  // Инициализация каждого плеера
   document.querySelectorAll('.player').forEach((player) => {
     const audioId = player.dataset.audio;
     const audio = document.getElementById(audioId);
-    const cover = player.querySelector('.cover-3d');
     const playBtn = player.querySelector('[data-action="play"]');
     const playIcon = player.querySelector('.play-icon');
     const back = player.querySelector('[data-action="back"]');
@@ -309,10 +284,8 @@
           if (a !== audio) a.pause();
         });
         audio.play();
-        cover.classList.add('flipped');
       } else {
         audio.pause();
-        cover.classList.remove('flipped');
       }
     });
 
@@ -333,7 +306,6 @@
       playIcon.innerHTML = PLAY;
       progressFill.style.width = '0%';
       audio.currentTime = 0;
-      cover.classList.remove('flipped');
     });
 
     progress.addEventListener('click', (e) => {
@@ -344,14 +316,6 @@
 
     back.addEventListener('click',    () => audio.currentTime = Math.max(0, audio.currentTime - 10));
     forward.addEventListener('click', () => audio.currentTime = Math.min(audio.duration, audio.currentTime + 10));
-  });
-
-  // При паузе одного плеера — убираем "flipped" с его обложки
-  document.querySelectorAll('audio').forEach((audio) => {
-    audio.addEventListener('pause', () => {
-      const player = audio.closest('.player');
-      if (player) player.querySelector('.cover-3d').classList.remove('flipped');
-    });
   });
 </script>
 
