@@ -27,9 +27,17 @@
     perspective: 1200px;
   }
 
-  .player {
+  /* Контейнер для нескольких карточек */
+  .playlist {
     width: 100%;
     max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+
+  .player {
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -173,64 +181,103 @@
 </head>
 <body>
 
-<div class="player">
+<div class="playlist">
 
-  <div class="cover-3d" id="cover">
-    <div class="cover-face cover-front">
-      <img src="cover.png" alt="">
+  <!-- Карточка 1: Nasty Dollz -->
+  <div class="player" data-audio="audio1">
+    <div class="cover-3d" id="cover1">
+      <div class="cover-face cover-front">
+        <img src="cover.png" alt="">
+      </div>
+      <div class="cover-face cover-back">
+        <img src="cover.png" alt="">
+      </div>
     </div>
-    <div class="cover-face cover-back">
-      <img src="cover.png" alt="">
+
+    <div class="artist">Nasty Dollz</div>
+    <div class="title">Track 1 Main Riff</div>
+
+    <div class="controls">
+      <button class="skip-btn" data-action="back" aria-label="Назад 10 секунд">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/>
+        </svg>
+      </button>
+      <button class="play-btn" data-action="play" aria-label="Играть">
+        <svg class="play-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </button>
+      <button class="skip-btn" data-action="forward" aria-label="Вперёд 10 секунд">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M13 6v12l8.5-6L13 6zM4 18l8.5-6L4 6v12z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress" data-role="progress">
+        <div class="progress-fill" data-role="progress-fill"></div>
+      </div>
+    </div>
+
+    <div class="time">
+      <span data-role="current">0:00</span>
+      <span data-role="duration">0:00</span>
     </div>
   </div>
 
-  <div class="artist">Nasty Dollz</div>
-  <div class="title">Track 1 Main Riff</div>
+  <!-- Карточка 2: Sashk Only — last song -->
+  <div class="player" data-audio="audio2">
+    <div class="cover-3d" id="cover2">
+      <div class="cover-face cover-front">
+        <img src="cover.png" alt="">
+      </div>
+      <div class="cover-face cover-back">
+        <img src="cover.png" alt="">
+      </div>
+    </div>
 
-  <div class="controls">
-    <button class="skip-btn" id="back" aria-label="Назад 10 секунд">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/>
-      </svg>
-    </button>
-    <button class="play-btn" id="play" aria-label="Играть">
-      <svg id="play-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M8 5v14l11-7z"/>
-      </svg>
-    </button>
-    <button class="skip-btn" id="forward" aria-label="Вперёд 10 секунд">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M13 6v12l8.5-6L13 6zM4 18l8.5-6L4 6v12z"/>
-      </svg>
-    </button>
-  </div>
+    <div class="artist">Sashk Only</div>
+    <div class="title">last song</div>
 
-  <div class="progress-wrap">
-    <div class="progress" id="progress">
-      <div class="progress-fill" id="progress-fill"></div>
+    <div class="controls">
+      <button class="skip-btn" data-action="back" aria-label="Назад 10 секунд">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/>
+        </svg>
+      </button>
+      <button class="play-btn" data-action="play" aria-label="Играть">
+        <svg class="play-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </button>
+      <button class="skip-btn" data-action="forward" aria-label="Вперёд 10 секунд">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M13 6v12l8.5-6L13 6zM4 18l8.5-6L4 6v12z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress" data-role="progress">
+        <div class="progress-fill" data-role="progress-fill"></div>
+      </div>
+    </div>
+
+    <div class="time">
+      <span data-role="current">0:00</span>
+      <span data-role="duration">0:00</span>
     </div>
   </div>
 
-  <div class="time">
-    <span id="current">0:00</span>
-    <span id="duration">0:00</span>
-  </div>
 </div>
 
-<audio id="audio" src="track.mp3" preload="metadata"></audio>
+<!-- Аудио-элементы -->
+<audio id="audio1" src="track.mp3" preload="metadata"></audio>
+<audio id="audio2" src="lastsong.mp3" preload="metadata"></audio>
 
 <script>
-  const audio = document.getElementById('audio');
-  const playBtn = document.getElementById('play');
-  const playIcon = document.getElementById('play-icon');
-  const progress = document.getElementById('progress');
-  const progressFill = document.getElementById('progress-fill');
-  const current = document.getElementById('current');
-  const duration = document.getElementById('duration');
-  const back = document.getElementById('back');
-  const forward = document.getElementById('forward');
-  const cover = document.getElementById('cover');
-
   const PLAY = '<path d="M8 5v14l11-7z"/>';
   const PAUSE = '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';
 
@@ -241,44 +288,71 @@
     return `${m}:${s}`;
   };
 
-  playBtn.addEventListener('click', () => {
-    if (audio.paused) {
-      audio.play();
-      cover.classList.add('flipped');
-    } else {
-      audio.pause();
+  // Инициализация каждого плеера
+  document.querySelectorAll('.player').forEach((player) => {
+    const audioId = player.dataset.audio;
+    const audio = document.getElementById(audioId);
+    const cover = player.querySelector('.cover-3d');
+    const playBtn = player.querySelector('[data-action="play"]');
+    const playIcon = player.querySelector('.play-icon');
+    const back = player.querySelector('[data-action="back"]');
+    const forward = player.querySelector('[data-action="forward"]');
+    const progress = player.querySelector('[data-role="progress"]');
+    const progressFill = player.querySelector('[data-role="progress-fill"]');
+    const current = player.querySelector('[data-role="current"]');
+    const duration = player.querySelector('[data-role="duration"]');
+
+    playBtn.addEventListener('click', () => {
+      if (audio.paused) {
+        // Останавливаем все остальные плееры
+        document.querySelectorAll('audio').forEach((a) => {
+          if (a !== audio) a.pause();
+        });
+        audio.play();
+        cover.classList.add('flipped');
+      } else {
+        audio.pause();
+        cover.classList.remove('flipped');
+      }
+    });
+
+    audio.addEventListener('play',  () => playIcon.innerHTML = PAUSE);
+    audio.addEventListener('pause', () => playIcon.innerHTML = PLAY);
+
+    audio.addEventListener('loadedmetadata', () => {
+      duration.textContent = fmt(audio.duration);
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      const pct = (audio.currentTime / audio.duration) * 100 || 0;
+      progressFill.style.width = pct + '%';
+      current.textContent = fmt(audio.currentTime);
+    });
+
+    audio.addEventListener('ended', () => {
+      playIcon.innerHTML = PLAY;
+      progressFill.style.width = '0%';
+      audio.currentTime = 0;
       cover.classList.remove('flipped');
-    }
+    });
+
+    progress.addEventListener('click', (e) => {
+      const rect = progress.getBoundingClientRect();
+      const pct = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = pct * audio.duration;
+    });
+
+    back.addEventListener('click',    () => audio.currentTime = Math.max(0, audio.currentTime - 10));
+    forward.addEventListener('click', () => audio.currentTime = Math.min(audio.duration, audio.currentTime + 10));
   });
 
-  audio.addEventListener('play',  () => playIcon.innerHTML = PAUSE);
-  audio.addEventListener('pause', () => playIcon.innerHTML = PLAY);
-
-  audio.addEventListener('loadedmetadata', () => {
-    duration.textContent = fmt(audio.duration);
+  // При паузе одного плеера — убираем "flipped" с его обложки
+  document.querySelectorAll('audio').forEach((audio) => {
+    audio.addEventListener('pause', () => {
+      const player = audio.closest('.player');
+      if (player) player.querySelector('.cover-3d').classList.remove('flipped');
+    });
   });
-
-  audio.addEventListener('timeupdate', () => {
-    const pct = (audio.currentTime / audio.duration) * 100 || 0;
-    progressFill.style.width = pct + '%';
-    current.textContent = fmt(audio.currentTime);
-  });
-
-  audio.addEventListener('ended', () => {
-    playIcon.innerHTML = PLAY;
-    progressFill.style.width = '0%';
-    audio.currentTime = 0;
-    cover.classList.remove('flipped');
-  });
-
-  progress.addEventListener('click', (e) => {
-    const rect = progress.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    audio.currentTime = pct * audio.duration;
-  });
-
-  back.addEventListener('click',    () => audio.currentTime = Math.max(0, audio.currentTime - 10));
-  forward.addEventListener('click', () => audio.currentTime = Math.min(audio.duration, audio.currentTime + 10));
 </script>
 
 </body>
