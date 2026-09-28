@@ -248,11 +248,53 @@
     </div>
   </div>
 
+  <!-- Карточка 3: Sashk Only — RRQ -->
+  <div class="player" data-audio="audio3">
+    <div class="cover-3d">
+      <div class="cover-face cover-front">
+        <img src="cover3.png" alt="">
+      </div>
+    </div>
+
+    <div class="artist">Sashk Only</div>
+    <div class="title">RRQ</div>
+
+    <div class="controls">
+      <button class="skip-btn" data-action="back" aria-label="Назад 10 секунд">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/>
+        </svg>
+      </button>
+      <button class="play-btn" data-action="play" aria-label="Играть">
+        <svg class="play-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </button>
+      <button class="skip-btn" data-action="forward" aria-label="Вперёд 10 секунд">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M13 6v12l8.5-6L13 6zM4 18l8.5-6L4 6v12z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress" data-role="progress">
+        <div class="progress-fill" data-role="progress-fill"></div>
+      </div>
+    </div>
+
+    <div class="time">
+      <span data-role="current">0:00</span>
+      <span data-role="duration">0:00</span>
+    </div>
+  </div>
+
 </div>
 
 <!-- Аудио-элементы -->
 <audio id="audio1" src="track.mp3" preload="metadata"></audio>
 <audio id="audio2" src="lastsong.mp3" preload="metadata"></audio>
+<audio id="audio3" src="rrq.mp3" preload="metadata"></audio>
 
 <script>
   const PLAY = '<path d="M8 5v14l11-7z"/>';
