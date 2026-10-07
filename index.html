@@ -17,22 +17,24 @@
     background: #000;
     color: #fff;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow-x: hidden;
   }
-
-html, body {
-  height: 100%;
-  background: #000;
-  color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  overflow-x: hidden;
-}
 
   .playlist {
     width: 100%;
     max-width: 420px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: 64px;
+    padding: 24px 0;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1200px;
   }
 
   .player {
@@ -174,6 +176,10 @@ html, body {
     box-shadow: 0 0 20px var(--magenta-glow);
     cursor: pointer;
     transition: right 0.3s ease;
+  }
+
+  .chat-toggle:active {
+    transform: translateY(-50%) scale(0.92);
   }
 
   .chat-toggle.open { right: 320px; }
@@ -394,7 +400,7 @@ html, body {
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
-    getDatabase, ref, push, onValue, remove, serverTimestamp, query, limitToLast
+    getDatabase, ref, push, onValue, remove, query, limitToLast
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
   const firebaseConfig = {
@@ -422,11 +428,9 @@ html, body {
   const toggle = document.getElementById('chat-toggle');
   const closeBtn = document.getElementById('chat-close');
 
-  // Восстанавливаем ник
   nickEl.value = localStorage.getItem('chatNick') || '';
   nickEl.addEventListener('input', () => localStorage.setItem('chatNick', nickEl.value.trim()));
 
-  // Открыть / закрыть
   function openChat() {
     panel.classList.add('open');
     toggle.classList.add('open');
@@ -443,7 +447,6 @@ html, body {
   });
   closeBtn.addEventListener('click', closeChat);
 
-  // Отправка
   function sendMessage() {
     const nick = nickEl.value.trim() || 'anon';
     const text = textEl.value.trim();
@@ -467,7 +470,6 @@ html, body {
     if (e.key === 'Enter') sendMessage();
   });
 
-  // Очистка
   clearBtn.addEventListener('click', () => {
     if (!confirm('Удалить все сообщения?')) return;
     remove(chatRef).catch(err => {
@@ -476,9 +478,7 @@ html, body {
     });
   });
 
-  // Рендер сообщений
   const chatQuery = query(chatRef, limitToLast(200));
-  let firstLoad = true;
 
   onValue(chatQuery, (snapshot) => {
     messagesEl.innerHTML = '';
@@ -510,12 +510,7 @@ html, body {
       messagesEl.appendChild(div);
     });
 
-    if (firstLoad) {
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-      firstLoad = false;
-    } else {
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
+    messagesEl.scrollTop = messagesEl.scrollHeight;
   }, (err) => {
     console.error('Ошибка чтения чата:', err);
     messagesEl.innerHTML = '<div style="color:#ff00ff;opacity:0.6;font-size:12px;">Не удалось загрузить чат. Проверь правила Firebase.</div>';
